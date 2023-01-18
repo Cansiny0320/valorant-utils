@@ -4,6 +4,9 @@ import vue from '@vitejs/plugin-vue'
 import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
 import pkg from './package.json'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
@@ -16,13 +19,24 @@ export default defineConfig(({ command }) => {
   return {
     plugins: [
       vue(),
+      AutoImport({
+        imports: [
+          'vue',
+          {
+            'naive-ui': ['useDialog', 'useMessage', 'useNotification', 'useLoadingBar'],
+          },
+        ],
+      }),
+      Components({
+        resolvers: [NaiveUiResolver()],
+      }),
       electron([
         {
           // Main-Process entry file of the Electron App.
           entry: 'electron/main/index.ts',
           onstart(options) {
             if (process.env.VSCODE_DEBUG) {
-              console.log(/* For `.vscode/.debug.script.mjs` */'[startup] Electron App')
+              console.log(/* For `.vscode/.debug.script.mjs` */ '[startup] Electron App')
             } else {
               options.startup()
             }
@@ -41,7 +55,7 @@ export default defineConfig(({ command }) => {
         {
           entry: 'electron/preload/index.ts',
           onstart(options) {
-            // Notify the Renderer-Process to reload the page when the Preload-Scripts build is complete, 
+            // Notify the Renderer-Process to reload the page when the Preload-Scripts build is complete,
             // instead of restarting the entire Electron App.
             options.reload()
           },
@@ -55,20 +69,22 @@ export default defineConfig(({ command }) => {
               },
             },
           },
-        }
+        },
       ]),
       // Use Node.js API in the Renderer-process
       renderer({
         nodeIntegration: true,
       }),
     ],
-    server: process.env.VSCODE_DEBUG && (() => {
-      const url = new URL(pkg.debug.env.VITE_DEV_SERVER_URL)
-      return {
-        host: url.hostname,
-        port: +url.port,
-      }
-    })(),
+    server:
+      process.env.VSCODE_DEBUG &&
+      (() => {
+        const url = new URL(pkg.debug.env.VITE_DEV_SERVER_URL)
+        return {
+          host: url.hostname,
+          port: +url.port,
+        }
+      })(),
     clearScreen: false,
   }
 })

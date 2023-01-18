@@ -1,6 +1,6 @@
 {
   "name": "valorant-utils",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "main": "dist-electron/main/index.js",
   "description": "valorant-utils",
   "author": "Cansiny0320 <Cansiny1220@gmail.com>",
@@ -20,7 +20,7 @@
     }
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "chcp 65001 && vite",
     "build": "vue-tsc --noEmit && vite build && electron-builder",
     "preview": "vite preview"
   },
@@ -28,11 +28,21 @@
     "@vitejs/plugin-vue": "^4.0.0",
     "electron": "^22.0.0",
     "electron-builder": "^23.6.0",
+    "naive-ui": "^2.34.3",
     "typescript": "^4.9.4",
+    "unplugin-auto-import": "^0.12.1",
+    "unplugin-vue-components": "^0.22.12",
     "vite": "^4.0.3",
     "vite-plugin-electron": "^0.11.1",
     "vite-plugin-electron-renderer": "^0.11.4",
     "vue": "^3.2.45",
     "vue-tsc": "^1.0.16"
+  },
+  "dependencies": {
+    "@valapi/auth": "^2.1.0",
+    "@valapi/lib": "^2.1.1",
+    "@valapi/valorant-api.com": "^2.1.1",
+    "@valapi/web-client": "^2.1.0",
+    "vue-router": "4"
   }
 }

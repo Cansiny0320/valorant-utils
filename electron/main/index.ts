@@ -1,7 +1,8 @@
+import WebClient from '@valapi/web-client'
 import { app, BrowserWindow, shell, ipcMain } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
-
+import { initAuth, getShopDailyOffers } from '../api'
 // The built directory structure
 //
 // ├─┬ dist-electron
@@ -35,6 +36,8 @@ if (!app.requestSingleInstanceLock()) {
 // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
 let win: BrowserWindow | null = null
+let webClient: WebClient | null = null
+let subject: string | null = null
 // Here, you can also use other preload
 const preload = join(__dirname, '../preload/index.js')
 const url = process.env.VITE_DEV_SERVER_URL
@@ -54,7 +57,8 @@ async function createWindow() {
     },
   })
 
-  if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
+  if (process.env.VITE_DEV_SERVER_URL) {
+    // electron-vite-vue#298
     win.loadURL(url)
     // Open devTool if the app is not packaged
     win.webContents.openDevTools()
@@ -63,8 +67,8 @@ async function createWindow() {
   }
 
   // Test actively push message to the Electron-Renderer
-  win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', new Date().toLocaleString())
+  win.webContents.on('did-finish-load', async () => {
+    // win?.webContents.send('main-process-message', '')
   })
 
   // Make all links open with the browser, not with the application
@@ -74,7 +78,24 @@ async function createWindow() {
   })
 }
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+  ipcMain.handle('initAuth', async (_, username, password) => {
+    try {
+      const data = await initAuth(username, password)
+      webClient = data.webClient
+      subject = data.subject
+      win?.webContents.send('initAuth', username, password)
+    } catch {}
+  })
+
+  ipcMain.handle('getInfo', async () => {
+    const res = await getShopDailyOffers(webClient, subject)
+    win.webContents.send('getInfo', {
+      dailyOffers: res,
+    })
+  })
+  createWindow()
+})
 
 app.on('window-all-closed', () => {
   win = null
@@ -104,7 +125,8 @@ ipcMain.handle('open-win', (_, arg) => {
     webPreferences: {
       preload,
       nodeIntegration: true,
-      contextIsolation: false,
+      contextIsolation: true,
+      webSecurity: false,
     },
   })
 

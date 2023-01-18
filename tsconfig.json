@@ -11,10 +11,9 @@
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "noImplicitAny": false
   },
-  "include": ["src"],
-  "references": [
-    { "path": "./tsconfig.node.json" }
-  ]
+  "include": ["src", "electron/api"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
