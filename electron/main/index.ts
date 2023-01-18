@@ -47,6 +47,9 @@ async function createWindow() {
   win = new BrowserWindow({
     title: 'Main window',
     icon: join(process.env.PUBLIC, 'favicon.ico'),
+    width: 1536,
+    height: 864,
+    resizable: false,
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -62,8 +65,10 @@ async function createWindow() {
     win.loadURL(url)
     // Open devTool if the app is not packaged
     win.webContents.openDevTools()
+    win.menuBarVisible = false
   } else {
     win.loadFile(indexHtml)
+    win.menuBarVisible = false
   }
 
   // Test actively push message to the Electron-Renderer
@@ -79,20 +84,29 @@ async function createWindow() {
 }
 
 app.whenReady().then(() => {
-  ipcMain.handle('initAuth', async (_, username, password) => {
+  ipcMain.handle('login', async (_, username, password) => {
     try {
       const data = await initAuth(username, password)
       webClient = data.webClient
       subject = data.subject
-      win?.webContents.send('initAuth', username, password)
-    } catch {}
+      win?.webContents.send('login-success', username, password)
+    } catch {
+      win?.webContents.send('login-fail')
+    }
   })
 
-  ipcMain.handle('getInfo', async () => {
+  ipcMain.handle('getDailyShop', async () => {
     const res = await getShopDailyOffers(webClient, subject)
-    win.webContents.send('getInfo', {
-      dailyOffers: res,
-    })
+    const fialRes = res.filter(e => e.name === '')
+    if (fialRes.length > 0) {
+      win.webContents.send('getDailyShop-fail', fialRes.length)
+      return
+    }
+    win.webContents.send('getDailyShop-success', res)
+  })
+
+  ipcMain.handle('toggleDevTools', () => {
+    win.webContents.toggleDevTools()
   })
   createWindow()
 })

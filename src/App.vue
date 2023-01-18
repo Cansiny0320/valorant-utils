@@ -1,7 +1,13 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { toggleDevTools } from './utils/toogleDevTools'
+
+toggleDevTools()
+</script>
 
 <template>
-  <router-view> </router-view>
+  <n-message-provider>
+    <router-view></router-view>
+  </n-message-provider>
 </template>
 
-<style></style>
+<style scoped lang="scss"></style>
