@@ -37,7 +37,7 @@ const playerInfo = ref<getPlayerInfoRes>()
 const router = useRouter()
 router.push('/daily-shop')
 
-ipcRenderer.on('playerInfo', (_, data: getPlayerInfoRes) => {
+ipcRenderer.on('playerInfo', (_, data: getPlayerInfoRes | undefined) => {
   playerInfo.value = data
 })
 </script>

@@ -59,7 +59,7 @@ export const getShopDailyOffers = async (webClient: WebClient, subject: string) 
 export const getPlayerInfo = async (
   webClient: WebClient,
   subject: string,
-): Promise<getPlayerInfoRes> => {
+): Promise<getPlayerInfoRes | undefined> => {
   try {
     const { data: playerData } = await webClient.DisplayNameService.fetchPlayers(subject)
     const { data: accountXPData } = await webClient.AccountXP.getPlayer(subject)
