@@ -2,7 +2,7 @@ import WebClient from '@valapi/web-client'
 import { app, BrowserWindow, shell, ipcMain } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
-import { initAuth, getShopDailyOffers } from '../api'
+import { initAuth, getShopDailyOffers, getPlayerInfo } from '../api'
 // The built directory structure
 //
 // ├─┬ dist-electron
@@ -90,6 +90,8 @@ app.whenReady().then(() => {
       webClient = data.webClient
       subject = data.subject
       win?.webContents.send('login-success', username, password)
+      const playerInfo = await getPlayerInfo(webClient, subject)
+      win?.webContents.send('playerInfo', playerInfo)
     } catch {
       win?.webContents.send('login-fail')
     }

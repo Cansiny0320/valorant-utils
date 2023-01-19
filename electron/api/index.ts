@@ -1,11 +1,9 @@
 import { AuthClient } from '@valapi/auth'
 import { WebClient } from '@valapi/web-client'
 import { ValorantApiCom } from '@valapi/valorant-api.com'
-
 import { Region } from '@valapi/lib'
 
-// const username = 'dasima2022'
-// const password = 'wjx001220'
+import type { getPlayerInfoRes } from '../../src/typing'
 
 const config = {
   region: Region.Default.Asia_Pacific,
@@ -58,10 +56,19 @@ export const getShopDailyOffers = async (webClient: WebClient, subject: string) 
   }
 }
 
-const getPlayerInfo = async (webClient: WebClient, subject: string) => {
+export const getPlayerInfo = async (
+  webClient: WebClient,
+  subject: string,
+): Promise<getPlayerInfoRes> => {
   try {
-    const { data } = await webClient.AccountXP.getPlayer(subject)
-    console.log(data)
+    const { data: playerData } = await webClient.DisplayNameService.fetchPlayers(subject)
+    const { data: accountXPData } = await webClient.AccountXP.getPlayer(subject)
+    const [player] = playerData
+    return {
+      gameName: player.GameName,
+      nextTimeFirstWinAvailable: accountXPData.NextTimeFirstWinAvailable,
+      level: accountXPData.Progress.Level,
+    }
   } catch {}
 }
 
