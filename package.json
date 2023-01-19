@@ -1,6 +1,6 @@
 {
   "name": "valorant-utils",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": "dist-electron/main/index.js",
   "description": "valorant-utils",
   "author": "Cansiny0320 <Cansiny1220@gmail.com>",
